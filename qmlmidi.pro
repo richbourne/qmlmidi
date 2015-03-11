@@ -10,18 +10,18 @@ CONFIG += c++11 qt plugin
 
 DESTDIR = $$PWD/org/komplex/qmlmidi
 
-INCLUDEPATH += rtmidi-2.1.0
+INCLUDEPATH += $$PWD/../rtmidi
 
 # Input
 SOURCES += \
     qmlmidi_plugin.cpp \
-    rtmidi-2.1.0/RtMidi.cpp \
+    ../rtmidi/RtMidi.cpp \
     qmlmidiin.cpp \
     qmlmidiout.cpp
 
 HEADERS += \
     qmlmidi_plugin.h \
-    rtmidi-2.1.0/RtMidi.h \
+    ../rtmidi/RtMidi.h \
     qmlmidiin.h \
     qmlmidiout.h \
     qmlmidi.h
