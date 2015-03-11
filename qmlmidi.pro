@@ -6,7 +6,7 @@
 TEMPLATE = lib
 TARGET = qmlmidi
 QT += qml quick
-CONFIG += qt plugin
+CONFIG += c++11 qt plugin
 
 DESTDIR = $$PWD/org/komplex/qmlmidi
 

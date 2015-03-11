@@ -13,13 +13,17 @@ class QmlMidiIn : public QQuickItem
     Q_OBJECT
 
     Q_PROPERTY(int portCount READ getPortCount)
-    Q_PROPERTY(int port READ getPort WRITE setPort)
-    Q_PROPERTY(QString portName READ getPortName WRITE setPortByName)
+    Q_PROPERTY(int port READ getPort WRITE setPort NOTIFY portChanged)
+    Q_PROPERTY(QString portName READ getPortName WRITE setPortByName NOTIFY portChanged)
     Q_PROPERTY(QList<QVariant> portNames READ getPortNames)
     Q_PROPERTY(bool active READ getActive WRITE setActive)
 
 public:
     explicit QmlMidiIn(QQuickItem *parent = 0);
+
+signals:
+    void portChanged();
+    void portNameChanged();
 
 private:
     RtMidiIn midiIn;
@@ -78,6 +82,8 @@ public:
         if(this->port>=0) closePort();
         this->port=port;
         if(!openPort(port)) port=-1;
+        DEBUG("emit portChanged");
+        emit portChanged();
     }
 
     QList<QVariant> getPortNames()
@@ -158,7 +164,6 @@ public slots:
         for(int i=0;i<msg->size();i++) m.append((quint8)msg->at(i));
         emit data(QVariant(m));
     }
-
 };
 
 QML_DECLARE_TYPE(QmlMidiIn)

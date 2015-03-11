@@ -24,13 +24,10 @@ Rectangle
 
         Repeater {
             model: [
-                "Out: "+synth.portName,
-                "Program: #"+synth.program,
-                "",
-                "Instructions:",
-                "- up/down to select midi out port",
-                "- left/right to select program",
-                "- qwerty to play",
+                "Input Port Count: " + synth.portCount,
+                "Input Port: "+synth.portName,
+                "Output Port: "+synthOut.portName,
+                "Output Program: #"+synthOut.program,
             ]
             Text {
                 x: 6
@@ -43,16 +40,31 @@ Rectangle
         }
     }
 
-    MidiOut
+    MidiIn
     {
         id:synth
+        port:0
+        active: true
+
+        property int program: 0
+
+        onData: {
+            console.log("data: " + data);
+        }
+    }
+
+    MidiOut
+    {
+        id:synthOut
         port:0
 
         property int program: 0
 
+
         onPortChanged: {
             program=0;
         }
+
 
         onProgramChanged: {
             sendMessage(0xc0, program, 0);
@@ -65,6 +77,8 @@ Rectangle
         anchors.fill: parent
         focus: true
 
+        property bool lights: false
+
         function key2note(keycode)
         {
             var ch=String.fromCharCode(keycode);
@@ -73,23 +87,31 @@ Rectangle
             return n+60;
         }
 
+        Keys.onTabPressed:
+        {
+            console.log("lights on?");
+            synthOut.sendMessage(0xB0, 0x00, lights ? 0x00 : 0x7F);
+            lights = !lights
+        }
+
         Keys.onPressed:
         {
             if(event.isAutoRepeat) return;
             var k=key2note(event.key);
-            synth.sendMessage(0x90, k, 100);
+            //synth.sendMessage(0x90, k, 100);
         }
         Keys.onReleased:
         {
             var k=key2note(event.key);
-            synth.sendMessage(0x80, k, 0);
+            //synth.sendMessage(0x80, k, 0);
         }
 
         Keys.onUpPressed:
         {
-            if(synth.port+1<synth.portCount)
+            if (synth.port+1<synth.portCount)
             {
                 synth.port++;
+                synthOut.port++;
             }
         }
 
@@ -98,19 +120,25 @@ Rectangle
             if(synth.port>0)
             {
                 synth.port--;
+                synthOut.port--;
             }
         }
 
         Keys.onLeftPressed:
         {
             synth.program--;
+            //synthOut.program--;
         }
 
         Keys.onRightPressed:
         {
             synth.program++;
+            //synthOut.program++;
         }
-
     }
 
+    Component.onCompleted:
+    {
+        console.log(synth.portNames[0])
+    }
 }
